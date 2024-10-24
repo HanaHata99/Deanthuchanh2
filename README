@@ -1,0 +1,6 @@
+git lfs migrate import --include="*.csv"
+
+django-admin startproject djangodean
+py manage.py runserver (chay kiem tra web)
+
+py manage.py startapp appdean
