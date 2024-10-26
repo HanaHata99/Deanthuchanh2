@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Dean</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="/listview">Tra cứu dữ liệu</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Phân tích dữ liệu</a>
+        </li>
+        <!-- <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Dropdown</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">Link</a></li>
+            <li><a class="dropdown-item" href="#">Another link</a></li>
+            <li><a class="dropdown-item" href="#">A third link</a></li>
+          </ul>
+        </li> -->
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-3">
+  <h2>Dữ liệu chi tiết của batch: {{ detail.batch_id }}</h2>
+  <p>Dữ liệu toàn diện các thông số pha chế, xu hướng bán hàng và số liệu chất lượng:</p>            
+  <div class='row'>
+    <form action="/action_page.php" class='col-sm-6 offset-sm-3'>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.batch_id }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Brew_Date }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Beer_Style }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.SKU }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Location }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Fermentation_Time }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Temperature }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.pH_Level }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Gravity }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Alcohol_Content }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Bitterness }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Color }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Ingredient_Ratio }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Volume_Produced }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Total_Sales }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Quality_Score }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+      <input type="email" class="form-control" value="{{ detail.Brewhouse_Efficiency }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Loss_During_Brewing }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Loss_During_Fermentation }}" id="email" placeholder="Enter email" name="email">
+      </div>
+      <div class="mb-3 mt-3">
+        <input type="email" class="form-control" value="{{ detail.Loss_During_Bottling_Kegging }}" id="email" placeholder="Enter email" name="email">
+      </div>
+    </form>
+    </div>
+  </div>
+
+</body>
+</html>

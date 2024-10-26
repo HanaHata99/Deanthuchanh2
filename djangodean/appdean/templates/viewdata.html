@@ -18,7 +18,7 @@
     <div class="collapse navbar-collapse" id="collapsibleNavbar">
       <ul class="navbar-nav">
         <li class="nav-item">
-          <a class="nav-link" href="#">Tra cứu dữ liệu</a>
+          <a class="nav-link" href="/listview">Tra cứu dữ liệu</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Phân tích dữ liệu</a>
@@ -37,37 +37,31 @@
 </nav>
 
 <div class="container mt-3">
-    <h2>Striped Rows</h2>
-    <p>The .table-striped class adds zebra-stripes to a table:</p>            
+    <h2>Dữ liệu nhà máy bia</h2>
+    <p>Dữ liệu toàn diện các thông số pha chế, xu hướng bán hàng và số liệu chất lượng:</p>            
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Firstname</th>
-          <th>Lastname</th>
-          <th>Email</th>
+          <th>Batch_ID</th>
+          <th>Brew_Date</th>
+          <th>Beer_Style</th>
+          <th>SKU</th>
+          <th>Detail</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>John</td>
-          <td>Doe</td>
-          <td>john@example.com</td>
-        </tr>
-        <tr>
-          <td>Mary</td>
-          <td>Moe</td>
-          <td>mary@example.com</td>
-        </tr>
-        <tr>
-          <td>July</td>
-          <td>Dooley</td>
-          <td>july@example.com</td>
-        </tr>
+        {% for x in mymembers %}
+          <tr>
+            <td>{{ x.batch_id }}</td>
+            <td>{{ x.Brew_Date }}</td>
+            <td>{{ x.Beer_Style }}</td>
+            <td>{{ x.SKU }}</td>
+            <td><a href="/detailview/?q={{ x.batch_id }}"  class="btn btn-outline-primary">Thông tin</a></td>
+          </tr>
+        {% endfor %}
       </tbody>
     </table>
   </div>
-
 </body>
 </html>
-
 
