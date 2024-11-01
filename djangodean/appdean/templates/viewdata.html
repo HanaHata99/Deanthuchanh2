@@ -1,4 +1,36 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{% block title %}Danh Sách Lô Sản Xuất{% endblock %}
+
+{% block content %}
+<h2 class="text-center">Dữ liệu nhà máy bia</h2>
+<p class="text-center text-muted">Dữ liệu toàn diện các thông số pha chế, xu hướng bán hàng và số liệu chất lượng:</p>
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>Batch_ID</th>
+            <th>Brew_Date</th>
+            <th>Beer_Style</th>
+            <th>SKU</th>
+            <th>Detail</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for x in mymembers %}
+        <tr>
+            <td>{{ x.batch_id }}</td>
+            <td>{{ x.Brew_Date }}</td>
+            <td>{{ x.Beer_Style }}</td>
+            <td>{{ x.SKU }}</td>
+            <td><a href="/detailview/?q={{ x.batch_id }}" class="btn btn-outline-primary">Thông tin</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+
+{% comment %} <!DOCTYPE html>
 <html lang="en">
 <head>
   <title>Bootstrap Example</title>
@@ -63,5 +95,4 @@
     </table>
   </div>
 </body>
-</html>
-
+</html> {% endcomment %}

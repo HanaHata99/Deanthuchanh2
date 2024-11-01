@@ -1,7 +1,7 @@
-filedoc = open("/Volumes/Trang Kata/data_complete_extended.csv", "r")
-filewrite = open("/Volumes/Trang Kata/cutdean.csv", "w")
+filedoc = open("D:\data_complete_extended.csv", "r")
+filewrite = open("D:\cutdean2.csv", "w")
 
-for x in range(1000001):
+for x in range(10):
     doc = filedoc.readline()
     filewrite.write(doc)
 

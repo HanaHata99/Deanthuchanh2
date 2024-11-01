@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}My Brewery App{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* Hiệu ứng nổi bật cho tab */
+        .nav-tabs .nav-link {
+            font-weight: 500;
+            color: #ddd; 
+            transition: background-color 0.3s, color 0.3s;
+            border-radius: 8px 8px 0 0;
+        }
+        .nav-tabs .nav-link.active {
+            color: #fff !important;
+            background-color: #007bff;
+            border-color: #007bff;
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+        }
+        /* Hiệu ứng khi hover */
+        .nav-tabs .nav-link:hover {
+            color: #fff; 
+            background-color: #0056b3;
+            border-radius: 8px 8px 0 0;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Dean</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+            <ul class="navbar-nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/listview' %}active{% endif %}" href="/listview">📋Tra cứu dữ liệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/add_data' %}active{% endif %}" href="/add_data">➕Thêm dữ liệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/analysis' %}active{% endif %}" href="/analysis">Phân tích dữ liệu</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>
+
+
+

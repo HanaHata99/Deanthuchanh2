@@ -1,109 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Bootstrap Example</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</head>
-<body>
+{% extends 'base.html' %}
 
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="#">Dean</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="collapsibleNavbar">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" href="/listview">Tra cứu dữ liệu</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Phân tích dữ liệu</a>
-        </li>
-        <!-- <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Dropdown</a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#">Link</a></li>
-            <li><a class="dropdown-item" href="#">Another link</a></li>
-            <li><a class="dropdown-item" href="#">A third link</a></li>
-          </ul>
-        </li> -->
-      </ul>
+{% block title %}Chi Tiết Lô Sản Xuất{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Batch Details: {{ detail.batch_id }}</h2>
     </div>
-  </div>
-</nav>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Thông Tin Cơ Bản</h3>
+                <table class="table">
+                    <tr><th>Batch ID:</th><td>{{ detail.batch_id }}</td></tr>
+                    <tr><th>Brew Date:</th><td>{{ detail.Brew_Date }}</td></tr>
+                    <tr><th>Beer Style:</th><td>{{ detail.Beer_Style }}</td></tr>
+                    <tr><th>SKU:</th><td>{{ detail.SKU }}</td></tr>
+                    <tr><th>Location:</th><td>{{ detail.Location }}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h3>Thông Số Quy Trình</h3>
+                <table class="table">
+                    <tr><th>Fermentation Time:</th><td>{{ detail.Fermentation_Time }} ngày</td></tr>
+                    <tr><th>Temperature:</th><td>{{ detail.Temperature }}°C</td></tr>
+                    <tr><th>pH Level:</th><td>{{ detail.pH_Level }}</td></tr>
+                    <tr><th>Gravity:</th><td>{{ detail.Gravity }}</td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h3>Đặc Điểm Sản Phẩm</h3>
+                <table class="table">
+                    <tr><th>Alcohol Content:</th><td>{{ detail.Alcohol_Content }}%</td></tr>
+                    <tr><th>Bitterness:</th><td>{{ detail.Bitterness }} IBU</td></tr>
+                    <tr><th>Color:</th><td>{{ detail.Color }} SRM</td></tr>
+                    <tr><th>Ingredient Ratio:</th><td>{{ detail.Ingredient_Ratio }}</td></tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h3>Số Liệu Sản Xuất</h3>
+                <table class="table">
+                    <tr><th>Volume Produced:</th><td>{{ detail.Volume_Produced }} L</td></tr>
+                    <tr><th>Total Sales:</th><td>${{ detail.Total_Sales }}</td></tr>
+                    <tr><th>Quality Score:</th><td>{{ detail.Quality_Score }}/5</td></tr>
+                    <tr><th>Brewhouse Efficiency:</th><td>{{ detail.Brewhouse_Efficiency }}%</td></tr>
+                </table>
+            </div>
+        </div>
 
-<div class="container mt-3">
-  <h2>Dữ liệu chi tiết của batch: {{ detail.batch_id }}</h2>
-  <p>Dữ liệu toàn diện các thông số pha chế, xu hướng bán hàng và số liệu chất lượng:</p>            
-  <div class='row'>
-    <form action="/action_page.php" class='col-sm-6 offset-sm-3'>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.batch_id }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Brew_Date }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Beer_Style }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.SKU }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Location }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Fermentation_Time }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Temperature }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.pH_Level }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Gravity }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Alcohol_Content }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Bitterness }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Color }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Ingredient_Ratio }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Volume_Produced }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Total_Sales }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Quality_Score }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-      <input type="email" class="form-control" value="{{ detail.Brewhouse_Efficiency }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Loss_During_Brewing }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Loss_During_Fermentation }}" id="email" placeholder="Enter email" name="email">
-      </div>
-      <div class="mb-3 mt-3">
-        <input type="email" class="form-control" value="{{ detail.Loss_During_Bottling_Kegging }}" id="email" placeholder="Enter email" name="email">
-      </div>
-    </form>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h3>Phân Tích Tổn Thất</h3>
+                <table class="table">
+                    <tr>
+                        <th>During Brewing:</th>
+                        <th>During Fermentation:</th>
+                        <th>During Bottling/Kegging:</th>
+                        <th>Total Loss:</th>
+                    </tr>
+                    <tr>
+                        <td>{{ detail.Loss_During_Brewing }}%</td>
+                        <td>{{ detail.Loss_During_Fermentation }}%</td>
+                        <td>{{ detail.Loss_During_Bottling_Kegging }}%</td>
+                        <td>{{ detail.Loss_During_Brewing|add:detail.Loss_During_Fermentation|add:detail.Loss_During_Bottling_Kegging }}%</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
-  </div>
+    <div class="card-footer">
+        <a href="/listview" class="btn btn-secondary">Quay lại danh sách</a>
+    </div>
+</div>
+{% endblock %}
 
-</body>
-</html>
+

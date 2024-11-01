@@ -13,3 +13,5 @@ python manage.py runserver
 
 // GITHUB
 
+Tuần 11: Nên điền form sau upload vì hiện tại chưa tính trường hợp upload file mà
+db đã có dữ liệu
