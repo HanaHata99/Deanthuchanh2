@@ -23,9 +23,9 @@
                 <h3>Thông Số Quy Trình</h3>
                 <table class="table">
                     <tr><th>Fermentation Time:</th><td>{{ detail.Fermentation_Time }} ngày</td></tr>
-                    <tr><th>Temperature:</th><td>{{ detail.Temperature }}°C</td></tr>
-                    <tr><th>pH Level:</th><td>{{ detail.pH_Level }}</td></tr>
-                    <tr><th>Gravity:</th><td>{{ detail.Gravity }}</td></tr>
+                    <tr><th>Temperature:</th><td>{{ detail.Temperature|floatformat:2 }}°C</td></tr>
+                    <tr><th>pH Level:</th><td>{{ detail.pH_Level|floatformat:2 }}</td></tr>
+                    <tr><th>Gravity:</th><td>{{ detail.Gravity|floatformat:2 }}</td></tr>
                 </table>
             </div>
         </div>
@@ -34,7 +34,7 @@
             <div class="col-md-6">
                 <h3>Đặc Điểm Sản Phẩm</h3>
                 <table class="table">
-                    <tr><th>Alcohol Content:</th><td>{{ detail.Alcohol_Content }}%</td></tr>
+                    <tr><th>Alcohol Content:</th><td>{{ detail.Alcohol_Content|floatformat:2 }}%</td></tr>
                     <tr><th>Bitterness:</th><td>{{ detail.Bitterness }} IBU</td></tr>
                     <tr><th>Color:</th><td>{{ detail.Color }} SRM</td></tr>
                     <tr><th>Ingredient Ratio:</th><td>{{ detail.Ingredient_Ratio }}</td></tr>
@@ -44,9 +44,9 @@
                 <h3>Số Liệu Sản Xuất</h3>
                 <table class="table">
                     <tr><th>Volume Produced:</th><td>{{ detail.Volume_Produced }} L</td></tr>
-                    <tr><th>Total Sales:</th><td>${{ detail.Total_Sales }}</td></tr>
-                    <tr><th>Quality Score:</th><td>{{ detail.Quality_Score }}/5</td></tr>
-                    <tr><th>Brewhouse Efficiency:</th><td>{{ detail.Brewhouse_Efficiency }}%</td></tr>
+                    <tr><th>Total Sales:</th><td>${{ detail.Total_Sales|floatformat:2 }}</td></tr>
+                    <tr><th>Quality Score:</th><td>{{ detail.Quality_Score|floatformat:2 }}</td></tr>
+                    <tr><th>Brewhouse Efficiency:</th><td>{{ detail.Brewhouse_Efficiency|floatformat:2 }}%</td></tr>
                 </table>
             </div>
         </div>
@@ -62,10 +62,10 @@
                         <th>Total Loss:</th>
                     </tr>
                     <tr>
-                        <td>{{ detail.Loss_During_Brewing }}%</td>
-                        <td>{{ detail.Loss_During_Fermentation }}%</td>
-                        <td>{{ detail.Loss_During_Bottling_Kegging }}%</td>
-                        <td>{{ detail.Loss_During_Brewing|add:detail.Loss_During_Fermentation|add:detail.Loss_During_Bottling_Kegging }}%</td>
+                        <td>{{ detail.Loss_During_Brewing|floatformat:2 }}%</td>
+                        <td>{{ detail.Loss_During_Fermentation|floatformat:2 }}%</td>
+                        <td>{{ detail.Loss_During_Bottling_Kegging|floatformat:2 }}%</td>
+                        <td>{{ detail.Loss_During_Brewing|add:detail.Loss_During_Fermentation|add:detail.Loss_During_Bottling_Kegging|floatformat:2 }}%</td>
                     </tr>
                 </table>
             </div>
