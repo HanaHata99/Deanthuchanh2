@@ -5,27 +5,119 @@ from django.contrib import messages
 
 import pandas as pd
 import pgsql
+import platform
+import json
+from django.http import JsonResponse
+from datetime import datetime, timedelta
+
+def get_database_pass():
+    system = platform.system()
+    if 'Darwin' == system:
+        return '12345'
+    else:
+        return '24032003'
+
+def convert_row(row):
+    # Class không có __dict__ method mà chỉ có __slots__ nên phải tự convert
+    return {
+            "batch_id": row.batch_id,
+            "Brew_Date": row.Brew_Date,
+            "Beer_Style": row.Beer_Style,
+            "SKU": row.SKU,
+            "Location": row.Location,
+            "Fermentation_Time": row.Fermentation_Time,
+            "Temperature": row.Temperature,
+            "pH_Level": row.pH_Level,
+            "Gravity": row.Gravity,
+            "Alcohol_Content": row.Alcohol_Content,
+            "Bitterness": row.Bitterness,
+            "Color": row.Color,
+            "Ingredient_Ratio": row.Ingredient_Ratio,
+            "Volume_Produced": row.Volume_Produced,
+            "Total_Sales": row.Total_Sales,
+            "Quality_Score": row.Quality_Score,
+            "Brewhouse_Efficiency": row.Brewhouse_Efficiency,
+            "Loss_During_Brewing": row.Loss_During_Brewing,
+            "Loss_During_Fermentation": row.Loss_During_Fermentation,
+            "Loss_During_Bottling_Kegging": row.Loss_During_Bottling_Kegging
+        }
 
 #Listview
 def listview(request):
-    template = loader.get_template('viewdata.html')
-    datas = []
-    with pgsql.Connection(("localhost", 5432), "postgres", "24032003", "postgres", tls = False) as db:
-        statement = db.prepare("SELECT * FROM dulieudean LIMIT 1000")
-        datas = list(statement())
-        
-        statement.close()
+    if 'GET' == request.method:
+        template = loader.get_template('viewdata.html')
+        datas = []
+        with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls = False) as db:
+            statement = db.prepare("SELECT * FROM dulieudean LIMIT 1000")
+            datas = list(statement())
+            
+            statement.close()
 
-    context = {
-        'mymembers': datas,
-    }
-    return HttpResponse(template.render(context, request))
+        context = {
+            'mymembers': datas,
+        }
+        return HttpResponse(template.render(context, request))
+    else:
+        formData = dict(request.POST.dict())
+        sql = '''
+            SELECT  *
+            FROM    dulieudean
+            WHERE 1 = 1
+            {}
+            LIMIT 1000
+        '''
+        datas = []
+        with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls = False) as db:
+
+            if ('SKU' == formData['column'] or 
+                'Location' == formData['column'] or 
+                'Beer_Style' == formData['column'] or 
+                'Color' == formData['column'] or 
+                'Ingredient_Ratio' == formData['column']):
+                
+                where_clause = '''
+                    AND LOWER("{}") LIKE $1
+                '''.format(formData["column"])
+
+                sql = sql.format(where_clause)
+                print(f'{sql} {where_clause}')
+                statement = db.prepare(sql)
+                rows = list(statement(f'%{formData["keyword"].lower()}%'))
+
+            elif 'Brew_Date' == formData['column']:
+                min_time = datetime.strptime(formData['keyword'], '%Y-%m-%d')
+                max_time = min_time + timedelta(seconds=59, minutes=59, hours=11)
+                where_clause = '''
+                    AND TO_TIMESTAMP($1, 'YYYY-MM-DD') <= "{}"
+                    AND "{}" <= TO_TIMESTAMP($2, 'YYYY-MM-DD HH:MI:SS PM')
+                '''.format(formData["column"], formData["column"])
+                
+                sql = sql.format(where_clause)
+                print(f'{sql} {where_clause}')
+                statement = db.prepare(sql)
+                rows = list(statement(min_time.strftime('%Y/%m/%d'), max_time.strftime('%Y/%m/%d %H:%M:%S PM')))
+
+            else:
+
+                where_clause = '''
+                    AND "{}"::text LIKE $1
+                '''.format(formData["column"])
+
+                sql = sql.format(where_clause)
+                print(f'{sql} {where_clause}')
+                statement = db.prepare(sql)
+                rows = list(statement(f'%{formData["keyword"]}%'))
+            
+            datas = [convert_row(row) for row in rows]
+            statement.close()
+            
+        return JsonResponse({'datas':json.dumps(datas)})
 
 #Detailview
 def detailview(request):
     template = loader.get_template('viewdetail.html')
     A = request.GET.get('q', 'default')
-    with pgsql.Connection(("localhost", 5432), "postgres", "24032003", "postgres", tls = False) as db:
+    with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls = False) as db:
 
         with db.prepare("SELECT * FROM dulieudean where batch_id = $1") as person:
             detail = person(A).row()
@@ -45,7 +137,7 @@ def add_data_view(request):
 def add_manual_data(request):
     if request.method == 'POST':
         try:
-            with pgsql.Connection(("localhost", 5432), "postgres", "24032003", "postgres", tls=False) as db:
+            with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
                 batch_id = request.POST.get('batch_id')
                 brew_date = request.POST.get('Brew_Date')
                 beer_style = request.POST.get('Beer_Style')
@@ -132,7 +224,7 @@ def upload_file(request):
                 return redirect('upload_file')
 
             # Kết nối với database và tải dữ liệu
-            with pgsql.Connection(("localhost", 5432), "postgres", "24032003", "postgres", tls=False) as db:
+            with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
                 statement = db.prepare("""
                     INSERT INTO dulieudean (
                         batch_id, "Brew_Date", "Beer_Style", "SKU", "Location", 
@@ -172,7 +264,7 @@ from rest_framework import status
 @api_view(['POST'])
 def add_manual_data_api(request):
     try:
-        with pgsql.Connection(("localhost", 5432), "postgres", "24032003", "postgres", tls=False) as db:
+        with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
             # Lấy dữ liệu từ request JSON
             batch_id = request.data.get('batch_id')
             brew_date = request.data.get('Brew_Date')
@@ -241,7 +333,7 @@ class UploadFileAPIView(APIView):
                 return Response({"error": "Only CSV and Excel files are supported", "ip_address": ip_address}, status=status.HTTP_400_BAD_REQUEST)
 
             # Kết nối tới PostgreSQL và tải dữ liệu vào database
-            with pgsql.Connection(("localhost", 5432), "postgres", "24032003", "postgres", tls=False) as db:
+            with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
                 statement = db.prepare("""
                     INSERT INTO dulieudean (
                         batch_id, "Brew_Date", "Beer_Style", "SKU", "Location", 
