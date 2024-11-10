@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% block title %}Phân tích dữ liệu{% endblock %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+<div class="card">
+    <div class="card-header">Khối lượng sản xuất theo tháng</div>
+    <div class="card-body">
+        <div class='row'>
+            <div class='col-md-8 offset-md-2' style="position: relative;">
+                <canvas id="myChart1" ></canvas>
+            </div>
+        </div>
+    </div> 
+</div>
+<br>
+<br>
+<div class="card">
+    <div class="card-header">Số lượng batch theo tháng</div>
+    <div class="card-body">
+        <div class='row'>
+            <div class='col-md-8 offset-md-2' style="position: relative;">
+                <canvas id="myChart2"></canvas>
+            </div>
+        </div>
+    </div> 
+</div>
+<br>
+<br>
+<div class="card">
+    <div class="card-header">Doanh số theo tháng</div>
+    <div class="card-body">
+        <div class='row'>
+            <div class='col-md-8 offset-md-2' style="position: relative;">
+                <canvas id="myChart3"></canvas>
+            </div>
+        </div>
+    </div> 
+</div>
+<br>
+<br>
+<script>    
+    function drawChart1() {
+        const xValues = {{volumn_months|safe}};
+        const yValues = {{volumn_infos|safe}};
+
+        new Chart("myChart1", {
+            type: "line",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    fill: false,
+                    lineTension: 0,
+                    backgroundColor: "rgba(0,0,255,1.0)",
+                    borderColor: "rgba(0,0,255,0.1)",
+                    data: yValues
+                }]
+            },
+            options: {
+                legend: {display: false},
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            callback: (val) => {
+                                let milion = val / Math.pow(10, 6)
+                                return `${milion} M`;
+                            },
+                        },
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            callback: (val) => {
+                                return `Tháng ${val}`;
+                            },
+                        },
+                    }],
+                },
+            }
+        });
+    }
+
+    function drawChart2() {
+        const xValues = {{batch_months|safe}};
+        const yValues = {{batch_infos|safe}};
+
+        new Chart("myChart2", {
+            type: "line",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    fill: false,
+                    lineTension: 0,
+                    backgroundColor: "rgba(0,0,255,1.0)",
+                    borderColor: "rgba(0,0,255,0.1)",
+                    data: yValues
+                }]
+            },
+            options: {
+                legend: {display: false},
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            callback: (val) => {
+                                let milion = val / Math.pow(10, 3)
+                                return `${milion} K`;
+                            },
+                        },
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            callback: (val) => {
+                                return `Tháng ${val}`;
+                            },
+                        },
+                    }],
+                },
+            }
+        });
+    }
+
+    function drawChart3() {
+        const xValues = {{sale_months|safe}};
+        const yValues = {{sale_infos|safe}};
+
+        new Chart("myChart3", {
+            type: "line",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    fill: false,
+                    lineTension: 0,
+                    backgroundColor: "rgba(0,0,255,1.0)",
+                    borderColor: "rgba(0,0,255,0.1)",
+                    data: yValues
+                }]
+            },
+            options: {
+                legend: {display: false},
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            callback: (val) => {
+                                let milion = val / Math.pow(10, 6)
+                                return `${milion} M`;
+                            },
+                        },
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            callback: (val) => {
+                                return `Tháng ${val}`;
+                            },
+                        },
+                    }],
+                },
+            }
+        });
+    }
+
+    drawChart1();
+    drawChart2();
+    drawChart3();
+</script>
+{% endblock %}
+
+

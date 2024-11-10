@@ -5,6 +5,7 @@ py manage.py startapp appdean
 
 // MACOS: Trang
 py manage.py runserver
+%WINDIR%\System32\cmd.exe "/K" C:\Users\BossTrang\anaconda3\Scripts\activate.bat C:\Users\BossTrang\anaconda3
 
 // WIN: TUAN
 conda env list

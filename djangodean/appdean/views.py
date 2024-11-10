@@ -2,20 +2,14 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import loader
 from django.contrib import messages
+from appdean.analysis import AnalysisData, get_database_pass
 
 import pandas as pd
 import pgsql
-import platform
 import json
 from django.http import JsonResponse
 from datetime import datetime, timedelta
 
-def get_database_pass():
-    system = platform.system()
-    if 'Darwin' == system:
-        return '12345'
-    else:
-        return '24032003'
 
 def convert_row(row):
     # Class không có __dict__ method mà chỉ có __slots__ nên phải tự convert
@@ -44,6 +38,7 @@ def convert_row(row):
 
 #Listview
 def listview(request):
+    # Xử lý GET request
     if 'GET' == request.method:
         template = loader.get_template('viewdata.html')
         datas = []
@@ -57,7 +52,10 @@ def listview(request):
             'mymembers': datas,
         }
         return HttpResponse(template.render(context, request))
+    
+    # Xử lý POST request: Submit form truy vấn dữ liệu
     else:
+        # Convert form data sang dictionary python để sử dụng
         formData = dict(request.POST.dict())
         sql = '''
             SELECT  *
@@ -66,9 +64,12 @@ def listview(request):
             {}
             LIMIT 1000
         '''
+
+        # Tạo biến để chứa toàn bộ kết quả tìm kiếm
         datas = []
         with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls = False) as db:
 
+            # Trường hợp tìm kiếm trên các column chữ (text)
             if ('SKU' == formData['column'] or 
                 'Location' == formData['column'] or 
                 'Beer_Style' == formData['column'] or 
@@ -84,6 +85,7 @@ def listview(request):
                 statement = db.prepare(sql)
                 rows = list(statement(f'%{formData["keyword"].lower()}%'))
 
+            # Trường hợp tìm kiếm trên các column ngày tháng (datetime)
             elif 'Brew_Date' == formData['column']:
                 min_time = datetime.strptime(formData['keyword'], '%Y-%m-%d')
                 max_time = min_time + timedelta(seconds=59, minutes=59, hours=11)
@@ -97,6 +99,7 @@ def listview(request):
                 statement = db.prepare(sql)
                 rows = list(statement(min_time.strftime('%Y/%m/%d'), max_time.strftime('%Y/%m/%d %H:%M:%S PM')))
 
+            # Trường hợp tìm kiếm trên các column số (integer/real)
             else:
 
                 where_clause = '''
@@ -111,7 +114,28 @@ def listview(request):
             datas = [convert_row(row) for row in rows]
             statement.close()
             
+        # Dữ liệu được trả về ở dạng json
         return JsonResponse({'datas':json.dumps(datas)})
+
+def analysis(request):
+    template = loader.get_template('analysis.html')
+    analysis = AnalysisData()
+
+    sales_by_month = analysis.sales_by_month()
+    context = {
+        'sale_infos': sales_by_month[0],
+        'sale_months': sales_by_month[1],
+    }
+
+    batch_by_month = analysis.batch_by_month()
+    context['batch_infos'] = batch_by_month[0]
+    context['batch_months'] = batch_by_month[1]
+
+    volumn_by_month = analysis.volumn_by_month()
+    context['volumn_infos'] = volumn_by_month[0]
+    context['volumn_months'] = volumn_by_month[1]
+
+    return HttpResponse(template.render(context, request=request))
 
 #Detailview
 def detailview(request):
