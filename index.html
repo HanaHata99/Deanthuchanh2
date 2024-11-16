@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tableau Web Data Connector</title>
+    <script type="text/javascript" src="https://tableau.github.io/webdataconnector/libs/tableauwdc-2.3.latest.js"></script>
+    <script type="text/javascript">
+        var myConnector = tableau.makeConnector();
+
+        // Hàm lấy dữ liệu từ API
+        myConnector.getData = function(table, doneCallback) {
+            // Gửi yêu cầu GET tới API của bạn
+            fetch("http://localhost:8000/api/get-all-data/")
+                .then(response => response.json())
+                .then(data => {
+                    // Dữ liệu từ API trả về là mảng các đối tượng
+                    data.forEach(row => {
+                        table.appendRow({
+                            "batch_id": row.batch_id,
+                            "Brew_Date": row.Brew_Date,
+                            "Beer_Style": row.Beer_Style,
+                            "SKU": row.SKU,
+                            "Location": row.Location,
+                            "Fermentation_Time": row.Fermentation_Time,
+                            "Temperature": row.Temperature,
+                            "pH_Level": row.pH_Level,
+                            "Gravity": row.Gravity,
+                            "Alcohol_Content": row.Alcohol_Content,
+                            "Bitterness": row.Bitterness,
+                            "Color": row.Color,
+                            "Ingredient_Ratio": row.Ingredient_Ratio,
+                            "Volume_Produced": row.Volume_Produced,
+                            "Total_Sales": row.Total_Sales,
+                            "Quality_Score": row.Quality_Score,
+                            "Brewhouse_Efficiency": row.Brewhouse_Efficiency,
+                            "Loss_During_Brewing": row.Loss_During_Brewing,
+                            "Loss_During_Fermentation": row.Loss_During_Fermentation,
+                            "Loss_During_Bottling_Kegging": row.Loss_During_Bottling_Kegging
+                        });
+                    });
+                    doneCallback();
+                })
+                .catch(error => {
+                    console.error('Error fetching data from API:', error);
+                    doneCallback();
+                });
+        };
+
+        // Đăng ký kết nối với Tableau
+        tableau.registerConnector(myConnector);
+
+        // Hàm khi người dùng nhấn nút kết nối
+        function init() {
+            tableau.connectionName = "Django API Data";
+            tableau.getData();
+        }
+    </script>
+</head>
+<body>
+    <h1>Tableau Web Data Connector</h1>
+    <button onclick="init()">Connect to Django API</button>
+</body>
+</html>
