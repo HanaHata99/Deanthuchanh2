@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brewery Data Connector</title>
+    <script src="https://connectors.tableau.com/libs/tableauwdc-2.3.latest.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #errorMessage {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Brewery Data Connector</h1>
+    <p>Click the button below to load brewery production data into Tableau.</p>
+    <button id="submitButton">Connect to Data</button>
+    <div id="errorMessage"></div>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // Create the connector object
+            var myConnector = tableau.makeConnector();
+
+            // Define the schema
+            myConnector.getSchema = function(schemaCallback) {
+                const cols = [
+                    { id: "batch_id", alias: "Batch ID", dataType: tableau.dataTypeEnum.int },
+                    { id: "Brew_Date", alias: "Brew Date", dataType: tableau.dataTypeEnum.datetime },
+                    { id: "Beer_Style", alias: "Beer Style", dataType: tableau.dataTypeEnum.string },
+                    { id: "SKU", alias: "SKU", dataType: tableau.dataTypeEnum.string },
+                    { id: "Location", alias: "Location", dataType: tableau.dataTypeEnum.string },
+                    { id: "Fermentation_Time", alias: "Fermentation Time", dataType: tableau.dataTypeEnum.float },
+                    { id: "Temperature", alias: "Temperature", dataType: tableau.dataTypeEnum.float },
+                    { id: "pH_Level", alias: "pH Level", dataType: tableau.dataTypeEnum.float },
+                    { id: "Gravity", alias: "Gravity", dataType: tableau.dataTypeEnum.float },
+                    { id: "Alcohol_Content", alias: "Alcohol Content", dataType: tableau.dataTypeEnum.float },
+                    { id: "Bitterness", alias: "Bitterness", dataType: tableau.dataTypeEnum.float },
+                    { id: "Color", alias: "Color", dataType: tableau.dataTypeEnum.string },
+                    { id: "Ingredient_Ratio", alias: "Ingredient Ratio", dataType: tableau.dataTypeEnum.string },
+                    { id: "Volume_Produced", alias: "Volume Produced", dataType: tableau.dataTypeEnum.float },
+                    { id: "Total_Sales", alias: "Total Sales", dataType: tableau.dataTypeEnum.float },
+                    { id: "Quality_Score", alias: "Quality Score", dataType: tableau.dataTypeEnum.float },
+                    { id: "Brewhouse_Efficiency", alias: "Brewhouse Efficiency", dataType: tableau.dataTypeEnum.float },
+                    { id: "Loss_During_Brewing", alias: "Loss During Brewing", dataType: tableau.dataTypeEnum.float },
+                    { id: "Loss_During_Fermentation", alias: "Loss During Fermentation", dataType: tableau.dataTypeEnum.float },
+                    { id: "Loss_During_Bottling_Kegging", alias: "Loss During Bottling/Kegging", dataType: tableau.dataTypeEnum.float }
+                ];
+
+                const tableSchema = {
+                    id: "breweryData",
+                    alias: "Brewery Production Data",
+                    columns: cols,
+                    incrementColumnId: "batch_id"
+                };
+
+                schemaCallback([tableSchema]);
+            };
+
+            // Download the data
+            myConnector.getData = function(table, doneCallback) {
+                const errorDiv = document.getElementById('errorMessage');
+                
+                fetch("http://localhost:8000/api/get-all-data/")
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (!Array.isArray(data)) {
+                            throw new Error('Data is not in the expected format');
+                        }
+
+                        const tableData = data.map(item => ({
+                            batch_id: item.batch_id,
+                            Brew_Date: item.Brew_Date,
+                            Beer_Style: item.Beer_Style,
+                            SKU: item.SKU,
+                            Location: item.Location,
+                            Fermentation_Time: item.Fermentation_Time,
+                            Temperature: item.Temperature,
+                            pH_Level: item.pH_Level,
+                            Gravity: item.Gravity,
+                            Alcohol_Content: item.Alcohol_Content,
+                            Bitterness: item.Bitterness,
+                            Color: item.Color,
+                            Ingredient_Ratio: item.Ingredient_Ratio,
+                            Volume_Produced: item.Volume_Produced,
+                            Total_Sales: item.Total_Sales,
+                            Quality_Score: item.Quality_Score,
+                            Brewhouse_Efficiency: item.Brewhouse_Efficiency,
+                            Loss_During_Brewing: item.Loss_During_Brewing,
+                            Loss_During_Fermentation: item.Loss_During_Fermentation,
+                            Loss_During_Bottling_Kegging: item.Loss_During_Bottling_Kegging
+                        }));
+
+                        table.appendRows(tableData);
+                        doneCallback();
+                    })
+                    .catch(error => {
+                        errorDiv.textContent = `Error fetching data: ${error.message}`;
+                        tableau.abortWithError(error.message);
+                    });
+            };
+
+            tableau.registerConnector(myConnector);
+
+            // Add event listeners after the page has loaded
+            document.addEventListener('DOMContentLoaded', function() {
+                const submitButton = document.getElementById('submitButton');
+                if (submitButton) {
+                    submitButton.addEventListener('click', function() {
+                        tableau.connectionName = "Brewery Production Data";
+                        tableau.submit();
+                    });
+                }
+            });
+        })();
+    </script>
+</body>
+</html>

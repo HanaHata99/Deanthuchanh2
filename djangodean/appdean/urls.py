@@ -11,5 +11,6 @@ urlpatterns = [
     path('upload_file/', views.upload_file, name='upload_file'),
     path('api/add-manual-data/', views.add_manual_data_api, name='add_manual_data_api'),
     path('api/upload-file/', views.UploadFileAPIView.as_view(), name='upload_file_api'),
+    path('api/get-all-data/', views.get_all_data, name='get_all_data'),
 ]
 

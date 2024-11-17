@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template import loader
 from django.contrib import messages
 from appdean.analysis import AnalysisData, get_database_pass
@@ -7,7 +7,6 @@ from appdean.analysis import AnalysisData, get_database_pass
 import pandas as pd
 import pgsql
 import json
-from django.http import JsonResponse
 from datetime import datetime, timedelta
 
 
@@ -386,4 +385,15 @@ class UploadFileAPIView(APIView):
         except Exception as e:
             return Response({"error": f"File upload error: {str(e)}", "ip_address": ip_address}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-    
+#Get API để kết nối Tableau   
+def get_all_data(request):
+    # Kết nối đến cơ sở dữ liệu và lấy tất cả dữ liệu từ bảng 'dulieudean'
+    with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
+        statement = db.prepare("SELECT * FROM dulieudean LIMIT 5000")
+        rows = statement()
+        
+        # Chuyển đổi dữ liệu thành định dạng JSON
+        data = [convert_row(row) for row in rows]  
+
+    # Trả dữ liệu dạng JSON
+    return JsonResponse(data, safe=False)
