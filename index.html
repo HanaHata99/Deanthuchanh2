@@ -36,7 +36,7 @@
             var myConnector = tableau.makeConnector();
 
             // Define the schema
-            myConnector.getSchema = function(schemaCallback) {
+            myConnector.getSchema = function (schemaCallback) {
                 const cols = [
                     { id: "batch_id", alias: "Batch ID", dataType: tableau.dataTypeEnum.int },
                     { id: "Brew_Date", alias: "Brew Date", dataType: tableau.dataTypeEnum.datetime },
@@ -71,60 +71,70 @@
             };
 
             // Download the data
-            myConnector.getData = function(table, doneCallback) {
-                const errorDiv = document.getElementById('errorMessage');
-                
-                fetch("http://localhost:8000/api/get-all-data/")
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (!Array.isArray(data)) {
-                            throw new Error('Data is not in the expected format');
+            myConnector.getData = function (table, doneCallback) {
+                const errorDiv = document.getElementById("errorMessage");
+                const pageSize = 50000; // Số bản ghi mỗi trang
+                let offset = 0; // Bắt đầu từ trang đầu tiên
+
+                async function fetchData() {
+                    try {
+                        while (true) {
+                            // Gọi API với offset và limit
+                            const response = await fetch(`http://localhost:8000/api/get-all-data/?offset=${offset}&limit=${pageSize}`);
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+
+                            const data = await response.json();
+                            if (!Array.isArray(data) || data.length === 0) {
+                                break; // Kết thúc khi không còn dữ liệu
+                            }
+
+                            // Chuyển dữ liệu thành định dạng phù hợp với Tableau
+                            const tableData = data.map((item) => ({
+                                batch_id: item.batch_id,
+                                Brew_Date: item.Brew_Date,
+                                Beer_Style: item.Beer_Style,
+                                SKU: item.SKU,
+                                Location: item.Location,
+                                Fermentation_Time: item.Fermentation_Time,
+                                Temperature: item.Temperature,
+                                pH_Level: item.pH_Level,
+                                Gravity: item.Gravity,
+                                Alcohol_Content: item.Alcohol_Content,
+                                Bitterness: item.Bitterness,
+                                Color: item.Color,
+                                Ingredient_Ratio: item.Ingredient_Ratio,
+                                Volume_Produced: item.Volume_Produced,
+                                Total_Sales: item.Total_Sales,
+                                Quality_Score: item.Quality_Score,
+                                Brewhouse_Efficiency: item.Brewhouse_Efficiency,
+                                Loss_During_Brewing: item.Loss_During_Brewing,
+                                Loss_During_Fermentation: item.Loss_During_Fermentation,
+                                Loss_During_Bottling_Kegging: item.Loss_During_Bottling_Kegging
+                            }));
+
+                            table.appendRows(tableData); // Thêm dữ liệu vào Tableau
+                            offset += pageSize; // Chuyển sang trang tiếp theo
                         }
 
-                        const tableData = data.map(item => ({
-                            batch_id: item.batch_id,
-                            Brew_Date: item.Brew_Date,
-                            Beer_Style: item.Beer_Style,
-                            SKU: item.SKU,
-                            Location: item.Location,
-                            Fermentation_Time: item.Fermentation_Time,
-                            Temperature: item.Temperature,
-                            pH_Level: item.pH_Level,
-                            Gravity: item.Gravity,
-                            Alcohol_Content: item.Alcohol_Content,
-                            Bitterness: item.Bitterness,
-                            Color: item.Color,
-                            Ingredient_Ratio: item.Ingredient_Ratio,
-                            Volume_Produced: item.Volume_Produced,
-                            Total_Sales: item.Total_Sales,
-                            Quality_Score: item.Quality_Score,
-                            Brewhouse_Efficiency: item.Brewhouse_Efficiency,
-                            Loss_During_Brewing: item.Loss_During_Brewing,
-                            Loss_During_Fermentation: item.Loss_During_Fermentation,
-                            Loss_During_Bottling_Kegging: item.Loss_During_Bottling_Kegging
-                        }));
-
-                        table.appendRows(tableData);
-                        doneCallback();
-                    })
-                    .catch(error => {
+                        doneCallback(); // Kết thúc quá trình tải dữ liệu
+                    } catch (error) {
                         errorDiv.textContent = `Error fetching data: ${error.message}`;
-                        tableau.abortWithError(error.message);
-                    });
+                        tableau.abortWithError(error.message); // Báo lỗi nếu có vấn đề
+                    }
+                }
+
+                fetchData();
             };
 
             tableau.registerConnector(myConnector);
 
             // Add event listeners after the page has loaded
-            document.addEventListener('DOMContentLoaded', function() {
-                const submitButton = document.getElementById('submitButton');
+            document.addEventListener("DOMContentLoaded", function () {
+                const submitButton = document.getElementById("submitButton");
                 if (submitButton) {
-                    submitButton.addEventListener('click', function() {
+                    submitButton.addEventListener("click", function () {
                         tableau.connectionName = "Brewery Production Data";
                         tableau.submit();
                     });

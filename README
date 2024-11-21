@@ -24,3 +24,5 @@ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-gi
 2.Khởi động web app
 3.Mở tableau desktop, trong connection tìm web data conenctor -> paste link vào 
 -> nhấn nút trên web được kết nối -> đợi tableau load
+Trong những lần load tiếp theo nếu có cập nhập: vào 1 sheet -> Click chuột phải vào tên data
+source góc trái -> Extract -> Refresh (incremental)

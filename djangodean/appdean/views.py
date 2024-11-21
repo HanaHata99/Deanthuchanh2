@@ -152,6 +152,41 @@ def detailview(request):
     }
     return HttpResponse(template.render(context, request))
 
+#Xóa bản ghi
+def delete_record(request):
+    if request.method == "POST":
+        record_id = request.POST.get('id')
+        try:
+            with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
+                statement = db.prepare("DELETE FROM dulieudean WHERE batch_id = $1")
+                statement(record_id)
+                statement.close()
+
+            # Redirect lại trang danh sách để tải lại
+            return redirect('/listview/')  # Chuyển hướng về trang danh sách sau khi xóa
+        except Exception as e:
+            return HttpResponse(f"Lỗi: {e}", status=500)
+
+    return HttpResponse("Phương thức không hợp lệ", status=400)
+
+#Xóa toàn bộ dữ liệu
+def delete_all_records(request):
+    if request.method == "POST":
+        try:
+            with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
+                # Lệnh SQL xóa toàn bộ dữ liệu
+                statement = db.prepare("DELETE FROM dulieudean")
+                statement()
+                statement.close()
+
+            # Redirect lại trang danh sách để tải lại sau khi xóa toàn bộ dữ liệu
+            return redirect('/listview/')
+        except Exception as e:
+            return HttpResponse(f"Lỗi: {e}", status=500)
+
+    return HttpResponse("Phương thức không hợp lệ", status=400)
+
+
 #Hiển thị tab "Thêm dữ liệu"
 def add_data_view(request):
     return render(request, 'add_data.html')
@@ -385,15 +420,13 @@ class UploadFileAPIView(APIView):
         except Exception as e:
             return Response({"error": f"File upload error: {str(e)}", "ip_address": ip_address}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-#Get API để kết nối Tableau   
+#Get API để kết nối Tableau  
 def get_all_data(request):
-    # Kết nối đến cơ sở dữ liệu và lấy tất cả dữ liệu từ bảng 'dulieudean'
+    offset = int(request.GET.get("offset", 0))
+    limit = int(request.GET.get("limit", 50000))  # Lô 10000 bản ghi
     with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
-        statement = db.prepare("SELECT * FROM dulieudean LIMIT 5000")
-        rows = statement()
-        
-        # Chuyển đổi dữ liệu thành định dạng JSON
-        data = [convert_row(row) for row in rows]  
-
-    # Trả dữ liệu dạng JSON
+        statement = db.prepare("SELECT * FROM dulieudean OFFSET $1 LIMIT $2")
+        rows = statement(offset, limit)
+        data = [convert_row(row) for row in rows]
     return JsonResponse(data, safe=False)
+

@@ -5,6 +5,9 @@
 {% block content %}
 <h2 class="text-center">Dữ liệu nhà máy bia</h2>
 <p class="text-center text-muted">Dữ liệu toàn diện các thông số pha chế, xu hướng bán hàng và số liệu chất lượng</p>
+<div class="text-end mb-3">
+  <button type="button" class="btn btn-danger" id="btnDeleteAll">Xóa Tất Cả Dữ Liệu</button>
+</div>
 <form id="formSearch">
   <div class="row">
     {% csrf_token %}
@@ -50,7 +53,7 @@
             <th>Brew_Date</th>
             <th>Beer_Style</th>
             <th>SKU</th>
-            <th class='action-item'>Detail</th>
+            <th class='action-item'>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -60,12 +63,48 @@
             <td>{{ x.Brew_Date }}</td>
             <td>{{ x.Beer_Style }}</td>
             <td>{{ x.SKU }}</td>
-            <td><a href="/detailview/?q={{ x.batch_id }}" class="btn btn-outline-primary">Thông tin</a></td>
+            <td><a href="/detailview/?q={{ x.batch_id }}" class="btn btn-outline-primary">Thông tin</a>
+                <form method="POST" action="/delete_record/" style="display:inline;" id="delete-form-{{ x.batch_id }}">
+                  {% csrf_token %}
+                  <input type="hidden" name="id" value="{{ x.batch_id }}">
+                  <button type="submit" class="btn btn-outline-danger" onclick="return confirmDelete('{{ x.batch_id }}')">Xóa</button>
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 <script>
+  function confirmDelete(batchId) {
+      return window.confirm('Bạn có chắc chắn muốn xóa bản ghi này?');
+    }
+  // Xử lý xóa tất cả dữ liệu
+  document.getElementById('btnDeleteAll').onclick = function() {
+    // Cảnh báo xác nhận
+    let isConfirmed = window.confirm('Bạn có chắc chắn muốn xóa toàn bộ dữ liệu?');
+
+    if (isConfirmed) {
+      // Nếu người dùng xác nhận, thực hiện yêu cầu xóa toàn bộ dữ liệu
+      fetch('/delete_all_records/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({'confirm': true})
+      })
+      .then(() => {
+        // Tải lại trang sau khi xóa
+        location.reload();  // Tải lại trang hiện tại
+      })
+      .catch(error => {
+        console.error('Lỗi:', error);
+        alert('Có lỗi xảy ra khi xóa dữ liệu.');
+      });
+    }
+  };
+
+  
   let txtKeyword = document.getElementById('txtKeyword');
   let selColumn = document.getElementById('selColumn');
   let btnSearch = document.getElementById('btnSearch');
@@ -122,10 +161,18 @@
             +
                 (true === isAdded ? '': `<td>${datas[i][selColumn.value] }</td>`)
             +
-        `   <td><a href="/detailview/?q=${datas[i].batch_id }" class="btn btn-outline-primary">Thông tin</a></td>
+        `   <td><a href="/detailview/?q=${datas[i].batch_id }" class="btn btn-outline-primary">Thông tin</a>
+                <form method="POST" action="/delete_record/" style="display:inline;" id="delete-form-{{ x.batch_id }}">
+                  {% csrf_token %}
+                  <input type="hidden" name="id" value="${datas[i].batch_id }">
+                  <button type="submit" class="btn btn-outline-danger" onclick="return confirmDelete('{{ x.batch_id }}')">Xóa</button>
+                </form>
+            </td>
         </tr>`
       rows += tr;
     }
+
+
     newbody.innerHTML = rows;
     table.removeChild(tbody);
     table.appendChild(newbody);
