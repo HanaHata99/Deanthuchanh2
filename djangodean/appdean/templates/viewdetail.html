@@ -13,19 +13,19 @@
                 <h3>Thông Tin Cơ Bản</h3>
                 <table class="table">
                     <tr><th>Batch ID:</th><td>{{ detail.batch_id }}</td></tr>
-                    <tr><th>Brew Date:</th><td>{{ detail.Brew_Date }}</td></tr>
-                    <tr><th>Beer Style:</th><td>{{ detail.Beer_Style }}</td></tr>
+                    <tr><th>Ngày sản xuất:</th><td>{{ detail.Brew_Date }}</td></tr>
+                    <tr><th>Loại bia:</th><td>{{ detail.Beer_Style }}</td></tr>
                     <tr><th>SKU:</th><td>{{ detail.SKU }}</td></tr>
-                    <tr><th>Location:</th><td>{{ detail.Location }}</td></tr>
+                    <tr><th>Địa điểm:</th><td>{{ detail.Location }}</td></tr>
                 </table>
             </div>
             <div class="col-md-6">
                 <h3>Thông Số Quy Trình</h3>
                 <table class="table">
-                    <tr><th>Fermentation Time:</th><td>{{ detail.Fermentation_Time }} ngày</td></tr>
-                    <tr><th>Temperature:</th><td>{{ detail.Temperature|floatformat:2 }}°C</td></tr>
-                    <tr><th>pH Level:</th><td>{{ detail.pH_Level|floatformat:2 }}</td></tr>
-                    <tr><th>Gravity:</th><td>{{ detail.Gravity|floatformat:2 }}</td></tr>
+                    <tr><th>Thời gian lên men (ngày):</th><td>{{ detail.Fermentation_Time }} ngày</td></tr>
+                    <tr><th>Nhiệt độ (°C):</th><td>{{ detail.Temperature|floatformat:2 }}°C</td></tr>
+                    <tr><th>Nồng độ pH:</th><td>{{ detail.pH_Level|floatformat:2 }}</td></tr>
+                    <tr><th>Trọng lượng</th><td>{{ detail.Gravity|floatformat:2 }}</td></tr>
                 </table>
             </div>
         </div>
@@ -34,19 +34,19 @@
             <div class="col-md-6">
                 <h3>Đặc Điểm Sản Phẩm</h3>
                 <table class="table">
-                    <tr><th>Alcohol Content:</th><td>{{ detail.Alcohol_Content|floatformat:2 }}%</td></tr>
-                    <tr><th>Bitterness:</th><td>{{ detail.Bitterness }} IBU</td></tr>
-                    <tr><th>Color:</th><td>{{ detail.Color }} SRM</td></tr>
-                    <tr><th>Ingredient Ratio:</th><td>{{ detail.Ingredient_Ratio }}</td></tr>
+                    <tr><th>Nồng độ cồn:</th><td>{{ detail.Alcohol_Content|floatformat:2 }}%</td></tr>
+                    <tr><th>Độ đắng:</th><td>{{ detail.Bitterness }} IBU</td></tr>
+                    <tr><th>Màu:</th><td>{{ detail.Color }} SRM</td></tr>
+                    <tr><th>Tỷ lệ nguyên liệu:</th><td>{{ detail.Ingredient_Ratio }}</td></tr>
                 </table>
             </div>
             <div class="col-md-6">
                 <h3>Số Liệu Sản Xuất</h3>
                 <table class="table">
-                    <tr><th>Volume Produced:</th><td>{{ detail.Volume_Produced }} L</td></tr>
-                    <tr><th>Total Sales:</th><td>${{ detail.Total_Sales|floatformat:2 }}</td></tr>
-                    <tr><th>Quality Score:</th><td>{{ detail.Quality_Score|floatformat:2 }}</td></tr>
-                    <tr><th>Brewhouse Efficiency:</th><td>{{ detail.Brewhouse_Efficiency|floatformat:2 }}%</td></tr>
+                    <tr><th>Sản lượng:</th><td>{{ detail.Volume_Produced }} L</td></tr>
+                    <tr><th>Doanh thu:</th><td>${{ detail.Total_Sales|floatformat:2 }}</td></tr>
+                    <tr><th>Điểm chất lượng:</th><td>{{ detail.Quality_Score|floatformat:2 }}</td></tr>
+                    <tr><th>Hiệu suất lên men:</th><td>{{ detail.Brewhouse_Efficiency|floatformat:2 }}%</td></tr>
                 </table>
             </div>
         </div>
@@ -56,10 +56,10 @@
                 <h3>Phân Tích Tổn Thất</h3>
                 <table class="table">
                     <tr>
-                        <th>During Brewing:</th>
-                        <th>During Fermentation:</th>
-                        <th>During Bottling/Kegging:</th>
-                        <th>Total Loss:</th>
+                        <th>Trong quá trình nấu:</th>
+                        <th>Trong quá trình lên men:</th>
+                        <th>Trong quá trình đóng thùng:</th>
+                        <th>Tổng mất mát:</th>
                     </tr>
                     <tr>
                         <td>{{ detail.Loss_During_Brewing|floatformat:2 }}%</td>
