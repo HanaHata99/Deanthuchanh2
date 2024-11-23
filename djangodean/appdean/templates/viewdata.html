@@ -133,25 +133,25 @@
     // Cảnh báo xác nhận
     let isConfirmed = window.confirm('Bạn có chắc chắn muốn xóa toàn bộ dữ liệu?');
 
-        if (isConfirmed) {
-            // Nếu người dùng xác nhận, thực hiện yêu cầu xóa toàn bộ dữ liệu
-            fetch('/delete_all_records/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: JSON.stringify({'confirm': true})
-            })
-            .then(() => {
-                // Tải lại trang sau khi xóa
-                location.reload();  // Tải lại trang hiện tại
-            })
-            .catch(error => {
-                console.error('Lỗi:', error);
-                alert('Có lỗi xảy ra khi xóa dữ liệu.');
-            });
-        }
+    if (isConfirmed) {
+        // Nếu người dùng xác nhận, thực hiện yêu cầu xóa toàn bộ dữ liệu
+        fetch('/delete_all_records/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({'confirm': true})
+        })
+        .then(() => {
+            // Tải lại trang sau khi xóa
+            location.reload();  // Tải lại trang hiện tại
+        })
+        .catch(error => {
+            console.error('Lỗi:', error);
+            alert('Có lỗi xảy ra khi xóa dữ liệu.');
+        });
+      }
     };
 
 
