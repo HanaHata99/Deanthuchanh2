@@ -31,6 +31,13 @@
         li.page-item:hover {
             cursor: pointer
         }
+        /* Đường viền đậm màu đen cho bảng */
+        .table-bordered th, .table-bordered td {
+            border: 3px solid #000000; /* Đường viền màu đen với độ dày 3px */
+        }
+        .table th, .table td {
+            padding: 15px; /* Tăng padding để các ô bảng không quá chật */
+        }
     </style>
 </head>
 <body>
@@ -51,6 +58,9 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {% if request.path == '/analysis' %}active{% endif %}" href="/analysis">📊Phân tích dữ liệu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path == '/data_table' %}active{% endif %}" href="/data_table">📁Bảng Dữ liệu</a>
                 </li>
             </ul>
         </div>

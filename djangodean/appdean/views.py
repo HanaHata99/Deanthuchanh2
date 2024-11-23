@@ -538,3 +538,23 @@ def export_all_to_google_sheets(request):
             offset += limit
 
     return HttpResponse("Dữ liệu đã được xuất lên Google Sheets!")
+
+
+from django.core.paginator import Paginator
+
+def data_table_view(request):
+    # Kết nối cơ sở dữ liệu PostgreSQL và lấy dữ liệu
+    with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
+        statement = db.prepare("SELECT * FROM dulieudean LIMIT 1000")
+        result = statement()  # Thực hiện truy vấn và lấy kết quả
+
+        # Chuyển đổi từng dòng dữ liệu thành từ điển
+        data = [convert_row(row) for row in result]  # result chứa các dòng dữ liệu từ cơ sở dữ liệu
+
+    # Sử dụng Paginator để phân trang
+    paginator = Paginator(data, 10)  # Chia dữ liệu thành các trang với 10 bản ghi mỗi trang
+    page_number = request.GET.get('page')  # Lấy số trang từ URL
+    page_obj = paginator.get_page(page_number)  # Lấy dữ liệu cho trang hiện tại
+
+    # Trả dữ liệu vào template
+    return render(request, 'data_table.html', {'page_obj': page_obj})
