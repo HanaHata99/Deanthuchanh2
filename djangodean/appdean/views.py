@@ -35,6 +35,37 @@ def convert_row(row):
             "Loss_During_Bottling_Kegging": row.Loss_During_Bottling_Kegging
         }
 
+def execute(sql, where_clause, db, *params):
+    
+    sql_data = sql.format("*", where_clause)
+    statement = db.prepare(sql_data)
+    rows = list(statement(*params))
+    statement.close()
+
+
+    # Tìm tổng số dòng dữ liệu thì không dùng ORDER BY batch_id
+    # COUNT là một aggregate function (tổng hợp các kết quả để cho ra một giá trị)
+    # Nếu trong câu lệnh muốn sử dụng/output ra một cột cụ thể thì cần group dữ liệu (GROUP BY)
+    where_clause = where_clause.replace("ORDER BY batch_id ASC", " ")
+    sql_counter = sql.format("COUNT(*) as count", where_clause)
+    counter = db.prepare(sql_counter)
+ 
+    # Gán offset bằng 0 thì gọi COUNT
+    tmp_params = list(params)
+    tmp_params[-1] = 0
+
+    max = counter(*(tuple(tmp_params))).row()
+    counter.close()
+
+    print(f'execute {sql_data} {sql_counter} {params}')
+
+    if None != max:
+        print(max)
+        count = max.count
+    else:
+        count = 0
+    return rows, count
+
 #Listview
 def listview(request):
     # Xử lý GET request
@@ -42,13 +73,22 @@ def listview(request):
         template = loader.get_template('viewdata.html')
         datas = []
         with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls = False) as db:
-            statement = db.prepare("SELECT * FROM dulieudean LIMIT 1000")
+            statement = db.prepare("SELECT * FROM dulieudean ORDER BY batch_id ASC LIMIT 100")
             datas = list(statement())
-            
             statement.close()
 
+            counter = db.prepare("SELECT COUNT(*) as count FROM dulieudean LIMIT 100")
+            max = counter().row()
+            if None != max:
+                count = max.count
+            else:
+                count = 0
+
+            counter.close()
+
         context = {
-            'mymembers': datas,
+            'datas': datas,
+            'count': count
         }
         return HttpResponse(template.render(context, request))
     
@@ -57,12 +97,16 @@ def listview(request):
         # Convert form data sang dictionary python để sử dụng
         formData = dict(request.POST.dict())
         sql = '''
-            SELECT  *
+            SELECT  {}
             FROM    dulieudean
             WHERE 1 = 1
             {}
-            LIMIT 1000
         '''
+
+        if True == formData["offset"].isnumeric():
+            formData["offset"] = (int(formData["offset"]) - 1) * int(formData["limit"])
+            if formData["offset"] < 0:
+                formData["offset"] = 0
 
         # Tạo biến để chứa toàn bộ kết quả tìm kiếm
         datas = []
@@ -77,12 +121,12 @@ def listview(request):
                 
                 where_clause = '''
                     AND LOWER("{}") LIKE $1
+                    ORDER BY batch_id ASC
+                    LIMIT $2
+                    OFFSET $3
                 '''.format(formData["column"])
 
-                sql = sql.format(where_clause)
-                print(f'{sql} {where_clause}')
-                statement = db.prepare(sql)
-                rows = list(statement(f'%{formData["keyword"].lower()}%'))
+                rows, count = execute(sql, where_clause, db, f'%{formData["keyword"].lower()}%', formData["limit"], formData["offset"])
 
             # Trường hợp tìm kiếm trên các column ngày tháng (datetime)
             elif 'Brew_Date' == formData['column']:
@@ -91,30 +135,31 @@ def listview(request):
                 where_clause = '''
                     AND TO_TIMESTAMP($1, 'YYYY-MM-DD') <= "{}"
                     AND "{}" <= TO_TIMESTAMP($2, 'YYYY-MM-DD HH:MI:SS PM')
+                    ORDER BY batch_id ASC
+                    LIMIT $3
+                    OFFSET $4
                 '''.format(formData["column"], formData["column"])
                 
-                sql = sql.format(where_clause)
-                print(f'{sql} {where_clause}')
-                statement = db.prepare(sql)
-                rows = list(statement(min_time.strftime('%Y/%m/%d'), max_time.strftime('%Y/%m/%d %H:%M:%S PM')))
-
+                rows, count = execute(sql, where_clause, db, min_time.strftime('%Y/%m/%d'), max_time.strftime('%Y/%m/%d %H:%M:%S PM'), formData["limit"], formData["offset"])
             # Trường hợp tìm kiếm trên các column số (integer/real)
             else:
 
                 where_clause = '''
                     AND "{}"::text LIKE $1
+                    ORDER BY batch_id ASC
+                    LIMIT $2
+                    OFFSET $3
                 '''.format(formData["column"])
 
-                sql = sql.format(where_clause)
-                print(f'{sql} {where_clause}')
-                statement = db.prepare(sql)
-                rows = list(statement(f'%{formData["keyword"]}%'))
+                rows, count = execute(sql, where_clause, db, f'%{formData["keyword"]}%', formData["limit"], formData["offset"])
             
             datas = [convert_row(row) for row in rows]
-            statement.close()
             
         # Dữ liệu được trả về ở dạng json
-        return JsonResponse({'datas':json.dumps(datas)})
+        return JsonResponse({
+            'datas': json.dumps(datas),
+            'count': count
+        })
 
 def analysis(request):
     template = loader.get_template('analysis.html')
