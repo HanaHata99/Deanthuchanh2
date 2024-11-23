@@ -1,14 +1,12 @@
 import platform
-import pgsql
-import pandas as pd
-
+from .web_utils import Utils
 
 def get_database_pass():
     system = platform.system()
     if 'Darwin' == system:
         return '12345'
     else:
-        return '24032003'
+        return '12345'
 
 class AnalysisData:
     def __init__(self) -> None:
@@ -39,22 +37,52 @@ class AnalysisData:
             "Loss_During_Bottling_Kegging": row.Loss_During_Bottling_Kegging
         }
 
-    def get_dataframe(self):
-        return self.dulieu
+    def sales_by_beertype(self):
+        sql = '''
+            SELECT  SUM("Total_Sales") AS sale,
+                    "Beer_Style"
+            FROM    dulieudean
+            GROUP BY "Beer_Style"
+            ORDER BY SALE DESC
+        '''
+        details = Utils.execute_sql(sql)
+
+        sale_bts = []
+        beer_styles = []
+        for detail in details:
+            sale_bts.append(detail.sale)
+            beer_styles.append(detail.Beer_Style)
+        
+        return sale_bts, beer_styles
     
+    def sales_by_location(self):
+        sql = '''
+            SELECT  SUM("Total_Sales") AS sale,
+                    "Location"
+            FROM    dulieudean
+            GROUP BY "Location"
+            ORDER BY SALE DESC
+        '''
+        details = Utils.execute_sql(sql)
+
+        sale_locations = []
+        locations = []
+        for detail in details:
+            sale_locations.append(detail.sale)
+            locations.append(detail.Location)
+        
+        return sale_locations, locations
+
     def sales_by_month(self):
-        sql= '''
+        sql = '''
             SELECT  SUM("Total_Sales") AS SALE,
                     DATE_PART('month', "Brew_Date")::int AS MNT
             FROM    dulieudean
             GROUP BY DATE_PART('month', "Brew_Date")
             ORDER BY MNT
         '''
-        details = []
-        with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls = False) as db:
-            with db.prepare(sql) as statement:
-                details = list(statement())
-        
+        details = Utils.execute_sql(sql)
+
         sales = []
         months = []
         for detail in details:
@@ -63,46 +91,29 @@ class AnalysisData:
 
         return (sales, months)
 
-    def batch_by_month(self):
-        sql= '''
-            SELECT  COUNT("batch_id") AS batch,
-                    DATE_PART('month', "Brew_Date")::int AS MNT
-            FROM    dulieudean
-            GROUP BY DATE_PART('month', "Brew_Date")
-            ORDER BY MNT
+    def loss_ratio(self):
+        sql = '''
+            SELECT  AVG("Loss_During_Brewing") AS Loss_During_Brewing,
+                    AVG("Loss_During_Fermentation") AS Loss_During_Fermentation,
+                    AVG("Loss_During_Bottling_Kegging") AS Loss_During_Bottling_Kegging
+            FROM dulieudean
         '''
-        details = []
-        with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls = False) as db:
-            with db.prepare(sql) as statement:
-                details = list(statement())
-        
-        batchs = []
-        months = []
-        for detail in details:
-            batchs.append(detail.batch)
-            months.append(detail.mnt)
+        data = Utils.execute_sql_arow(sql)
+        return (data.loss_during_brewing, data.loss_during_fermentation, data.loss_during_bottling_kegging)
 
-        return (batchs, months)
-    
-    def volumn_by_month(self):
+    def quality_score(self):
         sql= '''
-            SELECT  SUM("Volume_Produced") AS VOL,
-                    DATE_PART('month', "Brew_Date")::int AS MNT
+            SELECT  "Beer_Style",
+                    AVG("Quality_Score") AS quality_score
             FROM    dulieudean
-            GROUP BY DATE_PART('month', "Brew_Date")
-            ORDER BY MNT
+            GROUP BY "Beer_Style"
+            ORDER BY quality_score DESC
         '''
-        details = []
-        with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls = False) as db:
-            with db.prepare(sql) as statement:
-                details = list(statement())
-        
-        volums = []
-        months = []
+        details = Utils.execute_sql(sql)
+        quality_scores = []
+        beer_styles = []
         for detail in details:
-            volums.append(detail.vol)
-            months.append(detail.mnt)
+            quality_scores.append(detail.quality_score)
+            beer_styles.append(detail.Beer_Style)
 
-        return (volums, months)
-
-
+        return (quality_scores, beer_styles)

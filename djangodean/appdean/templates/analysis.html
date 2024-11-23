@@ -1,165 +1,302 @@
 {% extends 'base.html' %}
 {% block title %}Phân tích dữ liệu{% endblock %}
 {% block content %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 
-<div class="card">
-    <div class="card-header">Khối lượng sản xuất theo tháng</div>
+<div class="card mb-4">
+    <div class="card-header"><h4>Doanh số theo loại bia (Beer_Style)</h4></div>
     <div class="card-body">
         <div class='row'>
             <div class='col-md-8 offset-md-2' style="position: relative;">
-                <canvas id="myChart1" ></canvas>
+                <canvas id="sale_by_beerstyle"></canvas>
             </div>
         </div>
     </div> 
 </div>
-<br>
-<br>
-<div class="card">
-    <div class="card-header">Số lượng batch theo tháng</div>
-    <div class="card-body">
-        <div class='row'>
-            <div class='col-md-8 offset-md-2' style="position: relative;">
-                <canvas id="myChart2"></canvas>
-            </div>
-        </div>
-    </div> 
-</div>
-<br>
-<br>
-<div class="card">
-    <div class="card-header">Doanh số theo tháng</div>
-    <div class="card-body">
-        <div class='row'>
-            <div class='col-md-8 offset-md-2' style="position: relative;">
-                <canvas id="myChart3"></canvas>
-            </div>
-        </div>
-    </div> 
-</div>
-<br>
-<br>
-<script>    
-    function drawChart1() {
-        const xValues = {{volumn_months|safe}};
-        const yValues = {{volumn_infos|safe}};
 
-        new Chart("myChart1", {
-            type: "line",
+<div class="card mb-4">
+    <div class="card-header"><h4>Doanh số cao nhất theo từng khu vực (Location)</h4></div>
+    <div class="card-body">
+        <div class='row'>
+            <div class='col-md-8 offset-md-2' style="position: relative;">
+                <canvas id="sales_by_location"></canvas>
+            </div>
+        </div>
+    </div> 
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><h4>Doanh số bán hàng theo từng tháng</h4></div>
+    <div class="card-body">
+        <div class='row'>
+            <div class='col-md-8 offset-md-2' style="position: relative;">
+                <canvas id="sales_by_month"></canvas>
+            </div>
+        </div>
+    </div> 
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><h4>Tỷ lệ mất mát trong quá trình sản xuất bia qua các giai đoạn</h4></div>
+    <div class="card-body">
+        <div class='row'>
+            <div class='col-md-8 offset-md-2' style="position: relative;">
+                <canvas id="loss_ratio"></canvas>
+            </div>
+        </div>
+    </div> 
+</div>
+
+<div class="card mb-4">
+    <div class="card-header"><h4>Điểm số trung bình của từng loại bia</h4></div>
+    <div class="card-body">
+        <div class='row'>
+            <div class='col-md-8 offset-md-2' style="position: relative;">
+                <canvas id="quality_score"></canvas>
+            </div>
+        </div>
+    </div> 
+</div>
+
+<script>
+    function sale_by_beerstyle() {
+        const datas = {{sale_bts|safe}};
+        const labels = {{beer_styles|safe}};
+        const canvas = document.getElementById('sale_by_beerstyle');
+
+        new Chart(canvas, {
+            type: 'bar',
             data: {
-                labels: xValues,
+                labels: labels,
                 datasets: [{
-                    fill: false,
-                    lineTension: 0,
-                    backgroundColor: "rgba(0,0,255,1.0)",
-                    borderColor: "rgba(0,0,255,0.1)",
-                    data: yValues
-                }]
+                    label: 'Doanh số theo loại bia (Beer_Style)',
+                    data: datas,
+                    borderWidth: 1,
+                    axis: 'y',
+                }],
             },
             options: {
-                legend: {display: false},
                 scales: {
-                    yAxes: [{
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Loại Bia (Beer_Style)',
+                            padding: {
+                                bottom: 30
+                            }
+                        }
+                    },
+                    x: {
                         ticks: {
-                            callback: (val) => {
-                                let milion = val / Math.pow(10, 6)
-                                return `${milion} M`;
-                            },
+                            callback: function(value, index, ticks) {
+                                let milion = value / Math.pow(10, 6)
+                                return `${milion.toLocaleString('en-US')} M`;
+                            }
                         },
-                    }],
-                    xAxes: [{
+                        title: {
+                            display: true,
+                            text: 'Tổng Doanh Số (VNĐ)',
+                            padding: {
+                                top: 30
+                            }
+                        }
+                    }
+                },
+                indexAxis: 'y',
+            }
+        });
+    }
+
+    function sales_by_location() {
+        const sale_locations = {{sale_locations|safe}};
+        const locations = {{locations|safe}};
+        const canvas = document.getElementById('sales_by_location');
+
+        new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: locations,
+                datasets: [{
+                    label: 'Doanh số cao nhất theo từng khu vực (Location)',
+                    data: sale_locations,
+                    borderWidth: 1,
+                }],
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
                         ticks: {
-                            callback: (val) => {
-                                return `Tháng ${val}`;
-                            },
+                            callback: function(value, index, ticks) {
+                                let milion = value / Math.pow(10, 6)
+                                return `${milion.toLocaleString('en-US')} M`;
+                            }
                         },
-                    }],
+                        title: {
+                            display: true,
+                            text: 'Tổng Doanh Số (VNĐ)',
+                            padding: {
+                                bottom: 30
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Khu vực (Location)',
+                            padding: {
+                                top: 30
+                            }
+                        }
+                    }
                 },
             }
         });
     }
 
-    function drawChart2() {
-        const xValues = {{batch_months|safe}};
-        const yValues = {{batch_infos|safe}};
+    function sales_by_month() {
+        const sale_infos = {{sale_infos|safe}};
+        const sale_months = {{sale_months|safe}};
+        const canvas = document.getElementById('sales_by_month');
 
-        new Chart("myChart2", {
-            type: "line",
+        new Chart(canvas, {
+            type: 'line',
             data: {
-                labels: xValues,
+                labels: sale_months,
                 datasets: [{
+                    label: 'Doanh số bán hàng theo từng tháng',
+                    data: sale_infos,
                     fill: false,
-                    lineTension: 0,
-                    backgroundColor: "rgba(0,0,255,1.0)",
-                    borderColor: "rgba(0,0,255,0.1)",
-                    data: yValues
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
                 }]
             },
             options: {
-                legend: {display: false},
                 scales: {
-                    yAxes: [{
+                    y: {
                         ticks: {
-                            callback: (val) => {
-                                let milion = val / Math.pow(10, 3)
-                                return `${milion} K`;
-                            },
+                            callback: function(value, index, ticks) {
+                                let milion = value / Math.pow(10, 6)
+                                return `${milion.toLocaleString('en-US')} M`;
+                            }
                         },
-                    }],
-                    xAxes: [{
+                        title: {
+                            display: true,
+                            text: 'Tổng Doanh Số (VNĐ)',
+                            padding: {
+                                bottom: 30
+                            }
+                        }
+                    },
+                    x: {
                         ticks: {
-                            callback: (val) => {
-                                return `Tháng ${val}`;
-                            },
+                            callback: function(value, index, ticks) {
+                                return `Tháng ${sale_months[index]}`;
+                            }
                         },
-                    }],
+                        title: {
+                            display: true,
+                            text: 'Tháng',
+                            padding: {
+                                top: 30
+                            }
+                        }
+                    }
                 },
             }
         });
     }
 
-    function drawChart3() {
-        const xValues = {{sale_months|safe}};
-        const yValues = {{sale_infos|safe}};
+    function loss_ratio() {
+        const datas = [{{Loss_During_Brewing}}, {{Loss_During_Fermentation}}, {{Loss_During_Bottling_Kegging}}];
+        const canvas = document.getElementById('loss_ratio');
 
-        new Chart("myChart3", {
-            type: "line",
+        new Chart(canvas, {
+            type: 'bar',
             data: {
-                labels: xValues,
+                labels: ['Brewing', 'Fermentation', 'Bottling/Kegging'],
                 datasets: [{
-                    fill: false,
-                    lineTension: 0,
-                    backgroundColor: "rgba(0,0,255,1.0)",
-                    borderColor: "rgba(0,0,255,0.1)",
-                    data: yValues
+                    label: 'Tỷ lệ mất mát trong quá trình sản xuất bia qua các giai đoạn',
+                    data: datas,
+                    borderWidth: 1,
                 }]
             },
             options: {
-                legend: {display: false},
                 scales: {
-                    yAxes: [{
-                        ticks: {
-                            callback: (val) => {
-                                let milion = val / Math.pow(10, 6)
-                                return `${milion} M`;
-                            },
-                        },
-                    }],
-                    xAxes: [{
-                        ticks: {
-                            callback: (val) => {
-                                return `Tháng ${val}`;
-                            },
-                        },
-                    }],
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Tỷ Lệ Mất Mát (%)',
+                            padding: {
+                                bottom: 30
+                            }
+                        }
+                        
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Giai Đoạn Sản Xuất',
+                            padding: {
+                                top: 30
+                            }
+                        }
+                    }
                 },
             }
         });
     }
+    
+    
+    function quality_score() {
+        const datas = {{quality_scores|safe}};
+        const labels = {{beer_styles|safe}};
+        const canvas = document.getElementById('quality_score');
 
-    drawChart1();
-    drawChart2();
-    drawChart3();
+        new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Điểm số trung bình của từng loại bia',
+                    data: datas,
+                    borderWidth: 1,
+                    axis: 'y',
+                }],
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Loại bia (Beer Style)',
+                            padding: {
+                                left: 30
+                            }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Điểm trung bình (Quality Score)',
+                            padding: {
+                                top: 30
+                            }
+                        }
+                    }
+                },
+                indexAxis: 'y',
+            }
+        });
+    }
+
+    sale_by_beerstyle();
+    sales_by_location();
+    sales_by_month();
+    loss_ratio();
+    quality_score();
 </script>
 {% endblock %}
 

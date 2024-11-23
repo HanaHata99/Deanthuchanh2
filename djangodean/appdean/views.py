@@ -171,13 +171,22 @@ def analysis(request):
         'sale_months': sales_by_month[1],
     }
 
-    batch_by_month = analysis.batch_by_month()
-    context['batch_infos'] = batch_by_month[0]
-    context['batch_months'] = batch_by_month[1]
+    sales_by_beertype = analysis.sales_by_beertype()
+    context['sale_bts'] = sales_by_beertype[0]
+    context['beer_styles'] = sales_by_beertype[1]
 
-    volumn_by_month = analysis.volumn_by_month()
-    context['volumn_infos'] = volumn_by_month[0]
-    context['volumn_months'] = volumn_by_month[1]
+    sales_by_location = analysis.sales_by_location()
+    context['sale_locations'] = sales_by_location[0]
+    context['locations'] = sales_by_location[1]
+
+    loss_ratio = analysis.loss_ratio()
+    context['Loss_During_Brewing'] = loss_ratio[0]
+    context['Loss_During_Fermentation'] = loss_ratio[1]
+    context['Loss_During_Bottling_Kegging'] = loss_ratio[1]
+
+    quality_score = analysis.quality_score()
+    context['quality_scores'] = quality_score[0]
+    # context['beer_styles'] = quality_score[1]
 
     return HttpResponse(template.render(context, request=request))
 
