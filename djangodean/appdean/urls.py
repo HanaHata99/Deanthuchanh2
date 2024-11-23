@@ -14,5 +14,6 @@ urlpatterns = [
     path('api/add-manual-data/', views.add_manual_data_api, name='add_manual_data_api'),
     path('api/upload-file/', views.UploadFileAPIView.as_view(), name='upload_file_api'),
     path('api/get-all-data/', views.get_all_data, name='get_all_data'),
+    path('export-all-to-sheets/', views.export_all_to_google_sheets, name='export_all_to_google_sheets'),
 ]
 

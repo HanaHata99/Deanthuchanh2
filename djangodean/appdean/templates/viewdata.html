@@ -5,7 +5,8 @@
 {% block content %}
 <h2 class="text-center">Dữ liệu nhà máy bia</h2>
 <p class="text-center text-muted">Dữ liệu toàn diện các thông số pha chế, xu hướng bán hàng và số liệu chất lượng</p>
-<div class="text-end mb-3">
+<div class="d-flex justify-content-between mb-3">
+  <button type="button" class="btn btn-success me-3" id="btnExportToSheets">Xuất Dữ Liệu Sang Google Sheets</button>
   <button type="button" class="btn btn-danger" id="btnDeleteAll">Xóa Tất Cả Dữ Liệu</button>
 </div>
 <form id="formSearch">
@@ -41,7 +42,7 @@
       </select>
     </div>
     <div class="col-md-2 d-grid">
-      <button class="btn btn-success btn-block" type="button" id="btnSearch">Tìm kiếm</button>
+      <button class="btn btn-primary btn-block" type="button" id="btnSearch">Tìm kiếm</button>
     </div>
   </div>
 </form>
@@ -78,6 +79,31 @@
   function confirmDelete(batchId) {
       return window.confirm('Bạn có chắc chắn muốn xóa bản ghi này?');
     }
+
+  // Xử lý xuất dữ liệu sang Google Sheets
+  document.getElementById('btnExportToSheets').onclick = function () {
+    fetch('/export-all-to-sheets/', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          throw new Error('Xuất dữ liệu thất bại');
+        }
+      })
+      .then(data => {
+        alert(data.message); // Hiển thị thông báo thành công
+      })
+      .catch(error => {
+        console.error('Lỗi:', error);
+        alert('Có lỗi xảy ra khi xuất dữ liệu');
+      });
+  };
+
   // Xử lý xóa tất cả dữ liệu
   document.getElementById('btnDeleteAll').onclick = function() {
     // Cảnh báo xác nhận

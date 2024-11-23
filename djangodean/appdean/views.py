@@ -420,7 +420,7 @@ class UploadFileAPIView(APIView):
         except Exception as e:
             return Response({"error": f"File upload error: {str(e)}", "ip_address": ip_address}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
-#Get API để kết nối Tableau  
+#Xuất API để kết nối Tableau  
 def get_all_data(request):
     offset = int(request.GET.get("offset", 0))
     limit = int(request.GET.get("limit", 50000))  # Lô 10000 bản ghi
@@ -430,3 +430,66 @@ def get_all_data(request):
         data = [convert_row(row) for row in rows]
     return JsonResponse(data, safe=False)
 
+#
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+
+# Đường dẫn tới file JSON chứa credentials của Google Sheets API
+CREDENTIALS_FILE = r'D:\DE AN THUC HANH 2\credentials.json'
+
+# Hàm lấy và xuất toàn bộ dữ liệu từ PostgreSQL lên Google Sheets
+def export_all_to_google_sheets(request):
+    # Cấu hình Google Sheets API
+    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+    creds = ServiceAccountCredentials.from_json_keyfile_name(CREDENTIALS_FILE, scope)
+    client = gspread.authorize(creds)
+
+    # Tạo hoặc mở Google Sheet
+    sheet_name = "GoogleSheetDjango"
+    try:
+        sheet = client.open(sheet_name).sheet1
+    except gspread.SpreadsheetNotFound:
+        sheet = client.create(sheet_name).sheet1
+
+    # Xóa dữ liệu cũ trên Google Sheet nếu cần
+    sheet.clear()
+
+    # Cấu hình tiêu đề cột
+    columns = [
+        "Batch ID", "Brew Date", "Beer Style", "SKU", "Location", 
+        "Fermentation Time", "Temperature", "pH Level", "Gravity",
+        "Alcohol Content", "Bitterness", "Color", "Ingredient Ratio",
+        "Volume Produced", "Total Sales", "Quality Score", 
+        "Brewhouse Efficiency", "Loss During Brewing", 
+        "Loss During Fermentation", "Loss During Bottling/Kegging"
+    ]
+    sheet.append_row(columns)  # Ghi tiêu đề cột vào Google Sheet
+
+    # Kết nối PostgreSQL và tải dữ liệu theo lô
+    limit = 50000  # Số bản ghi mỗi lô
+    offset = 0  # Vị trí bắt đầu
+
+    with pgsql.Connection(("localhost", 5432), "postgres", get_database_pass(), "postgres", tls=False) as db:
+        statement = db.prepare("SELECT * FROM dulieudean OFFSET $1 LIMIT $2")
+        
+        while True:
+            # Truy vấn dữ liệu với offset và limit
+            rows = statement(offset, limit)
+            
+            # Nếu không còn dữ liệu, thoát vòng lặp
+            if not rows:
+                break
+
+            # Chuyển đổi dữ liệu
+            data = [convert_row(row) for row in rows]
+
+            # Tạo danh sách dữ liệu cần thêm
+            rows_to_add = [list(row.values()) for row in data]
+
+            # Đưa dữ liệu lên Google Sheets bằng append_rows
+            sheet.append_rows(rows_to_add)
+
+            # Cập nhật offset để lấy trang tiếp theo
+            offset += limit
+
+    return HttpResponse("Dữ liệu đã được xuất lên Google Sheets!")
