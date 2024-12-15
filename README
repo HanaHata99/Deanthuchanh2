@@ -1,3 +1,12 @@
+Dự án Django Web App, được phối hợp thực hiện bởi Luyện Minh Tuấn (tôi) và Trịnh Thùy Trang
+- Kết nối cơ sở dữ liệu, hiển thị ListView và DetailView
+- Thêm dữ liệu thông qua điền form và tải file csv/excel
+- Các chức năng : tìm kiếm thông tin theo các trường, tương tác với các bản ghi như chỉnh sửa, xóa
+- Hiển thị bảng dữ liệu (table) và đồ thị
+- Xuất dữ liệu qua Google Sheets và Tableau thông qua API
+
+
+// Khởi động dự án
 git lfs migrate import --include="*.csv"
 django-admin startproject djangodean
 py manage.py startapp appdean
