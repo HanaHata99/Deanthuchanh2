@@ -14,9 +14,6 @@ python manage.py runserver
 
 // GITHUB
 
-Tuần 11: Nên điền form sau upload vì hiện tại chưa tính trường hợp upload file mà
-db đã có dữ liệu
-
 Kết nối qua tableau:
 1.host web với trang tạo bằng index.html bằng github pages: 
 https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site
@@ -25,4 +22,4 @@ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-gi
 3.Mở tableau desktop, trong connection tìm web data conenctor -> paste link vào 
 -> nhấn nút trên web được kết nối -> đợi tableau load
 Trong những lần load tiếp theo nếu có cập nhập: vào 1 sheet -> Click chuột phải vào tên data
-source góc trái -> Extract -> Refresh (incremental)
+source góc trái -> Extract -> Refresh (Full)
